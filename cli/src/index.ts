@@ -22,7 +22,7 @@ const program = new Command();
 program
   .name("agentsmap")
   .description("CLI tool for the AGENTS.map specification — discover, validate, and resolve AGENTS.md files.")
-  .version("0.1.1");
+  .version("0.1.2");
 
 // ──────────────────────────────────────────────────────────────────────────────
 // init
