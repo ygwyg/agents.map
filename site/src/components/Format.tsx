@@ -28,6 +28,10 @@ const tree: TreeRow[] = [
   { name: "infra", type: "folder", depth: 0 },
   { name: "AGENTS.md", type: "file", depth: 1, entryId: "infra" },
   { name: "main.tf", type: "file", depth: 1 },
+  { name: "node_modules", type: "folder", depth: 0 },
+  { name: "@acme", type: "folder", depth: 1 },
+  { name: "ui", type: "folder", depth: 2 },
+  { name: "AGENTS.md", type: "file", depth: 3, entryId: "dep" },
 ];
 
 /* ── Map entry ranges ── */
@@ -42,6 +46,7 @@ const mapEntries: MapEntry[] = [
   { id: "payments", lineRange: [14, 20] },
   { id: "ui", lineRange: [22, 27] },
   { id: "infra", lineRange: [29, 33] },
+  { id: "dep", lineRange: [35, 39] },
 ];
 
 const getEntryForLine = (num: number): string | null => {
@@ -92,6 +97,12 @@ const lines: Line[] = [
   { num: 31, content: <><span className="s-key">{"  Applies to: "}</span><span className="s-glob">/infra/**</span></> },
   { num: 32, content: <><span className="s-key">{"  Last modified: "}</span><span className="s-date">2026-02-18</span></> },
   { num: 33, content: <><span className="s-key">{"  Owners: "}</span><span className="s-owner">@platform</span></> },
+  { num: 34, content: null },
+  { num: 35, content: <><span className="s-key">- Path: </span><span className="s-path">/node_modules/@acme/ui/AGENTS.md</span></> },
+  { num: 36, content: <><span className="s-key">{"  Purpose: "}</span><span className="s-val">Acme component API, theming, a11y requirements.</span></> },
+  { num: 37, content: <><span className="s-key">{"  Applies to: "}</span><span className="s-glob">/src/components/**, /frontend/**</span></> },
+  { num: 38, content: <><span className="s-key">{"  Priority: "}</span><span className="s-priority">low</span></> },
+  { num: 39, content: <><span className="s-key">{"  Tags: "}</span><span className="s-tag">frontend, dependency</span></> },
 ];
 
 /* ── Component ── */

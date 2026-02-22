@@ -27,6 +27,12 @@ The AGENTS.md files themselves are authoritative for their subtrees.
   - Purpose: Component library, accessibility requirements, Storybook conventions.
   - Applies to: /packages/ui/**
   - Owners: @design-systems
+  - Tags: frontend, shared
+
+- Path: /node_modules/@acme/ui/AGENTS.md
+  - Purpose: Acme component API, theming, a11y requirements.
+  - Applies to: /src/components/**, /frontend/**
+  - Tags: frontend, dependency
 ```
 
 ## Quick start
@@ -38,8 +44,14 @@ npx agentsmap init
 # Validate the map
 npx agentsmap validate
 
+# Include AGENTS.md from dependencies
+npx agentsmap init --deps
+
 # See which instructions apply to a path
 npx agentsmap resolve src/payments/checkout.ts
+
+# Find entries by tag
+npx agentsmap resolve --tag frontend
 ```
 
 ## CLI
@@ -49,14 +61,18 @@ npx agentsmap resolve src/payments/checkout.ts
 | `agentsmap init` | Scan for `AGENTS.md` files and generate `AGENTS.map.md` |
 | `agentsmap validate` | Check that all listed paths exist and fields are valid |
 | `agentsmap resolve <path>` | Show which `AGENTS.md` files apply to a given path |
+| `agentsmap resolve --tag <t>` | Find entries by tag (e.g., `frontend`, `compliance`) |
 | `agentsmap discover` | Find all `AGENTS.md` files and show their listing status |
+| `agentsmap discover --deps` | Include `AGENTS.md` files from `node_modules` |
 
 ## Specification
 
 The full v1 spec is at [`spec/v1.md`](./spec/v1.md). The key points:
 
 - `AGENTS.map.md` goes at the repository root.
-- Each entry has a `Path`, `Purpose`, and `Applies to` glob. Optional: `Owners`, `Tags`, `Last reviewed`.
+- Each entry has a `Path`, `Purpose`, and `Applies to` glob. Optional: `Priority`, `Last modified`, `Owners`, `Tags`, `Last reviewed`.
+- Entries can reference dependencies (`node_modules/`) — the map indexes instructions shipped by your packages.
+- Tags enable cross-cutting queries: `agentsmap resolve --tag frontend` finds all frontend-relevant entries.
 - The map is informational — if it conflicts with an actual `AGENTS.md`, the `AGENTS.md` wins.
 - If the map is missing or stale, agents fall back to scanning. Nothing breaks.
 

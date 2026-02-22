@@ -38,6 +38,8 @@ export function GetStarted() {
 
       <p className="text-[15px] text-[#c4c4cc] mb-8 leading-[1.8]">
         Generate from existing AGENTS.md files, or create one by hand.
+        Use <span className="text-white/70">--deps</span> to
+        include instructions shipped by your dependencies.
       </p>
 
       <div className="space-y-3 mb-8">
@@ -52,6 +54,12 @@ export function GetStarted() {
             Validate it
           </p>
           <Terminal command="npx agentsmap validate" />
+        </div>
+        <div>
+          <p className="text-[12px] text-white/50 mb-1.5">
+            Include dependencies
+          </p>
+          <Terminal command="npx agentsmap init --deps" />
         </div>
         <div>
           <p className="text-[12px] text-white/50 mb-1.5">
