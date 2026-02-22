@@ -8,16 +8,22 @@ The AGENTS.md files themselves are authoritative for their subtrees.
 - Path: /AGENTS.md
   - Purpose: Global repo conventions: language standards, commit message format, CI/CD pipeline rules, and PR review expectations.
   - Applies to: /**
+  - Priority: high
+  - Last modified: 2026-02-15
   - Owners: @platform-team
 
 - Path: /services/auth/AGENTS.md
   - Purpose: Authentication service rules: OAuth2 flows, token handling, session management. Security-sensitive — all changes require @security-team review.
   - Applies to: /services/auth/**
+  - Priority: critical
+  - Last modified: 2026-02-20
   - Owners: @identity-team, @security-team
 
 - Path: /services/payments/AGENTS.md
   - Purpose: Payments domain rules, PCI-DSS constraints, Stripe integration patterns, test fixtures with sanitized card numbers.
   - Applies to: /services/payments/**
+  - Priority: critical
+  - Last modified: 2026-02-18
   - Owners: @payments-team
 
 - Path: /services/notifications/AGENTS.md

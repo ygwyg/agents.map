@@ -1,4 +1,4 @@
-import { useState, useCallback, type ReactNode } from "react";
+import { useState, useCallback, useEffect, useRef, type ReactNode } from "react";
 
 /* ── File tree data ── */
 
@@ -38,10 +38,10 @@ interface MapEntry {
 }
 
 const mapEntries: MapEntry[] = [
-  { id: "root", lineRange: [8, 10] },
-  { id: "payments", lineRange: [12, 15] },
-  { id: "ui", lineRange: [17, 20] },
-  { id: "infra", lineRange: [22, 25] },
+  { id: "root", lineRange: [8, 12] },
+  { id: "payments", lineRange: [14, 20] },
+  { id: "ui", lineRange: [22, 27] },
+  { id: "infra", lineRange: [29, 33] },
 ];
 
 const getEntryForLine = (num: number): string | null => {
@@ -67,23 +67,31 @@ const lines: Line[] = [
   { num: 6, content: <span className="s-h2">## Entries</span> },
   { num: 7, content: null },
   { num: 8, content: <><span className="s-key">- Path: </span><span className="s-path">/AGENTS.md</span></> },
-  { num: 9, content: <><span className="s-key">{"  Purpose: "}</span><span className="s-val">Global conventions, CI/CD</span></> },
+  { num: 9, content: <><span className="s-key">{"  Purpose: "}</span><span className="s-val">Repo-wide coding standards, PR rules, CI pipeline.</span></> },
   { num: 10, content: <><span className="s-key">{"  Applies to: "}</span><span className="s-glob">/**</span></> },
-  { num: 11, content: null },
-  { num: 12, content: <><span className="s-key">- Path: </span><span className="s-path">/services/payments/AGENTS.md</span></> },
-  { num: 13, content: <><span className="s-key">{"  Purpose: "}</span><span className="s-val">PCI rules, Stripe patterns</span></> },
-  { num: 14, content: <><span className="s-key">{"  Applies to: "}</span><span className="s-glob">/services/payments/**</span></> },
-  { num: 15, content: <><span className="s-key">{"  Owners: "}</span><span className="s-owner">@payments-team</span></> },
-  { num: 16, content: null },
-  { num: 17, content: <><span className="s-key">- Path: </span><span className="s-path">/packages/ui/AGENTS.md</span></> },
-  { num: 18, content: <><span className="s-key">{"  Purpose: "}</span><span className="s-val">Component library, a11y</span></> },
-  { num: 19, content: <><span className="s-key">{"  Applies to: "}</span><span className="s-glob">/packages/ui/**</span></> },
-  { num: 20, content: <><span className="s-key">{"  Owners: "}</span><span className="s-owner">@design-systems</span></> },
+  { num: 11, content: <><span className="s-key">{"  Priority: "}</span><span className="s-priority">high</span></> },
+  { num: 12, content: <><span className="s-key">{"  Last modified: "}</span><span className="s-date">2026-02-15</span></> },
+  { num: 13, content: null },
+  { num: 14, content: <><span className="s-key">- Path: </span><span className="s-path">/services/payments/AGENTS.md</span></> },
+  { num: 15, content: <><span className="s-key">{"  Purpose: "}</span><span className="s-val">PCI-DSS constraints, Stripe integration, test fixtures.</span></> },
+  { num: 16, content: <><span className="s-key">{"  Applies to: "}</span><span className="s-glob">/services/payments/**</span></> },
+  { num: 17, content: <><span className="s-key">{"  Priority: "}</span><span className="s-priority">critical</span></> },
+  { num: 18, content: <><span className="s-key">{"  Last modified: "}</span><span className="s-date">2026-02-20</span></> },
+  { num: 19, content: <><span className="s-key">{"  Owners: "}</span><span className="s-owner">@payments-team</span></> },
+  { num: 20, content: <><span className="s-key">{"  Tags: "}</span><span className="s-tag">backend, compliance</span></> },
   { num: 21, content: null },
-  { num: 22, content: <><span className="s-key">- Path: </span><span className="s-path">/infra/AGENTS.md</span></> },
-  { num: 23, content: <><span className="s-key">{"  Purpose: "}</span><span className="s-val">Terraform, deploys</span></> },
-  { num: 24, content: <><span className="s-key">{"  Applies to: "}</span><span className="s-glob">/infra/**</span></> },
-  { num: 25, content: <><span className="s-key">{"  Owners: "}</span><span className="s-owner">@platform</span></> },
+  { num: 22, content: <><span className="s-key">- Path: </span><span className="s-path">/packages/ui/AGENTS.md</span></> },
+  { num: 23, content: <><span className="s-key">{"  Purpose: "}</span><span className="s-val">Design tokens, WCAG 2.1 AA, Storybook conventions.</span></> },
+  { num: 24, content: <><span className="s-key">{"  Applies to: "}</span><span className="s-glob">/packages/ui/**</span></> },
+  { num: 25, content: <><span className="s-key">{"  Last modified: "}</span><span className="s-date">2026-01-10</span></> },
+  { num: 26, content: <><span className="s-key">{"  Owners: "}</span><span className="s-owner">@design-systems</span></> },
+  { num: 27, content: <><span className="s-key">{"  Tags: "}</span><span className="s-tag">frontend, shared</span></> },
+  { num: 28, content: null },
+  { num: 29, content: <><span className="s-key">- Path: </span><span className="s-path">/infra/AGENTS.md</span></> },
+  { num: 30, content: <><span className="s-key">{"  Purpose: "}</span><span className="s-val">Terraform modules, deploy workflows, env promotion.</span></> },
+  { num: 31, content: <><span className="s-key">{"  Applies to: "}</span><span className="s-glob">/infra/**</span></> },
+  { num: 32, content: <><span className="s-key">{"  Last modified: "}</span><span className="s-date">2026-02-18</span></> },
+  { num: 33, content: <><span className="s-key">{"  Owners: "}</span><span className="s-owner">@platform</span></> },
 ];
 
 /* ── Component ── */
@@ -91,6 +99,7 @@ const lines: Line[] = [
 export function Format() {
   const [activeEntry, setActiveEntry] = useState<string | null>(null);
   const handleHover = useCallback((id: string | null) => setActiveEntry(id), []);
+  const treeRef = useRef<HTMLDivElement>(null);
 
   const activeRange = activeEntry
     ? mapEntries.find((e) => e.id === activeEntry)?.lineRange
@@ -98,6 +107,15 @@ export function Format() {
 
   const isLineActive = (num: number) =>
     activeRange != null && num >= activeRange[0] && num <= activeRange[1];
+
+  // Auto-scroll tree to active entry
+  useEffect(() => {
+    if (!activeEntry || !treeRef.current) return;
+    const node = treeRef.current.querySelector(`[data-entry="${activeEntry}"]`);
+    if (node) {
+      node.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    }
+  }, [activeEntry]);
 
   return (
     <>
@@ -114,8 +132,8 @@ export function Format() {
         in your codebase. Hover a file to see its entry.
       </p>
 
-      {/* IDE container */}
-      <div className="editor" onMouseLeave={() => handleHover(null)}>
+      {/* IDE container — break out of 620px column */}
+      <div className="editor -mx-6 sm:-mx-10" onMouseLeave={() => handleHover(null)}>
         {/* Titlebar */}
         <div className="editor-titlebar">
           <div className="editor-dot" />
@@ -124,9 +142,12 @@ export function Format() {
           <span className="ml-3 text-[11px] text-white/40">myrepo</span>
         </div>
 
-        <div className="flex">
+        <div className="flex max-h-[480px]">
           {/* File tree panel */}
-          <div className="w-[180px] flex-shrink-0 border-r border-white/[0.06]">
+          <div
+            ref={treeRef}
+            className="w-[180px] flex-shrink-0 border-r border-white/[0.06] overflow-y-auto"
+          >
             <div className="px-3 py-2 text-[10px] uppercase tracking-[0.1em] text-white/30">
               Explorer
             </div>
@@ -138,6 +159,7 @@ export function Format() {
                 return (
                   <div
                     key={i}
+                    data-entry={node.entryId}
                     className={`flex items-center h-[22px] text-[11px] cursor-default transition-colors overflow-hidden whitespace-nowrap ${
                       node.isMap
                         ? "bg-white/[0.06] text-white/60"
@@ -169,13 +191,13 @@ export function Format() {
           </div>
 
           {/* Map file content */}
-          <div className="flex-1 min-w-0">
-            <div className="px-3 py-1.5 border-b border-white/[0.06]">
+          <div className="flex-1 min-w-0 overflow-y-auto">
+            <div className="px-3 py-1.5 border-b border-white/[0.06] sticky top-0 bg-black/80 backdrop-blur-sm z-10">
               <span className="text-[11px] text-white/50 bg-white/[0.05] px-2 py-0.5 rounded">
                 AGENTS.map.md
               </span>
             </div>
-            <div className="py-3">
+            <div className="py-3 overflow-x-auto">
               {lines.map((line) => (
                 <div
                   key={line.num}
@@ -183,7 +205,7 @@ export function Format() {
                   onMouseEnter={() => handleHover(getEntryForLine(line.num))}
                 >
                   <span className="editor-ln !w-[32px] !pr-3 !text-[11px]">{line.num}</span>
-                  <span className="editor-lc !text-[12px]">{line.content ?? "\u00A0"}</span>
+                  <span className="editor-lc !text-[12px] whitespace-nowrap">{line.content ?? "\u00A0"}</span>
                 </div>
               ))}
             </div>

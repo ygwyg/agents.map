@@ -1,6 +1,6 @@
 {
   "name": "agentsmap",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "CLI tool for the AGENTS.map specification — discover, validate, and resolve AGENTS.md instruction files.",
   "type": "module",
   "bin": {

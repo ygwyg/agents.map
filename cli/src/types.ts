@@ -2,6 +2,9 @@
  * AGENTS.map type definitions (v1 spec).
  */
 
+/** Priority levels for entries, inspired by sitemap priority. */
+export type Priority = "critical" | "high" | "normal" | "low";
+
 /** A single entry in the AGENTS.map.md file. */
 export interface AgentsMapEntry {
   /** POSIX path relative to repo root. Must not contain ".." or start with "/". */
@@ -10,11 +13,15 @@ export interface AgentsMapEntry {
   scope: string[];
   /** 1-3 sentences explaining why/when to use this file. */
   purpose: string;
+  /** How important this file is for agents. Default: "normal". */
+  priority?: Priority;
+  /** Date the AGENTS.md content was last meaningfully changed (YYYY-MM-DD). */
+  last_modified?: string;
   /** Optional team handles, CODEOWNERS aliases, etc. */
   owners?: string[];
   /** Optional categorical labels. */
   tags?: string[];
-  /** Optional date in YYYY-MM-DD format. */
+  /** Date a human last verified the instructions are still correct (YYYY-MM-DD). */
   last_reviewed?: string;
 }
 

@@ -8,6 +8,8 @@ The AGENTS.md files themselves are authoritative for their subtrees.
 - Path: /AGENTS.md
   - Purpose: Shell application rules: module federation config, shared dependency versioning, routing conventions between micro-frontends.
   - Applies to: /**
+  - Priority: high
+  - Last modified: 2026-02-10
   - Owners: @platform-fe
   - Tags: global, frontend
 
@@ -31,6 +33,8 @@ The AGENTS.md files themselves are authoritative for their subtrees.
 - Path: /mfe/checkout/AGENTS.md
   - Purpose: Checkout micro-frontend: payment form PCI compliance, cart state management, order submission flow.
   - Applies to: /mfe/checkout/**
+  - Priority: critical
+  - Last modified: 2026-02-19
   - Owners: @commerce-team, @security-team
   - Tags: mfe, compliance
 

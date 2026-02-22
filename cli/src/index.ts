@@ -13,7 +13,7 @@ import * as readline from "node:readline";
 
 import { parseMap, findMap } from "./parser.js";
 import { validate } from "./validator.js";
-import { resolveEntries, formatMatch } from "./resolver.js";
+import { resolveEntries, resolveByTag, formatMatch } from "./resolver.js";
 import { discoverAgentFiles, inferPurpose } from "./discoverer.js";
 import { createMap, toMarkdown } from "./generator.js";
 
@@ -22,7 +22,7 @@ const program = new Command();
 program
   .name("agentsmap")
   .description("CLI tool for the AGENTS.map specification — discover, validate, and resolve AGENTS.md files.")
-  .version("0.1.0");
+  .version("0.2.0");
 
 // ──────────────────────────────────────────────────────────────────────────────
 // init
@@ -171,10 +171,11 @@ program
 // ──────────────────────────────────────────────────────────────────────────────
 
 program
-  .command("resolve <target-path>")
-  .description("Show which AGENTS.md files apply to a given path.")
+  .command("resolve [target-path]")
+  .description("Show which AGENTS.md files apply to a given path or tag.")
   .option("--json", "Output in JSON format.")
-  .action((targetPath: string, opts: { json?: boolean }) => {
+  .option("--tag <tags>", "Find entries by tag (comma-separated) instead of path.")
+  .action((targetPath: string | undefined, opts: { json?: boolean; tag?: string }) => {
     const cwd = process.cwd();
 
     let map;
@@ -186,6 +187,46 @@ program
       process.exit(1);
     }
 
+    // Tag-based resolution
+    if (opts.tag) {
+      const tags = opts.tag.split(",").map((t) => t.trim());
+      const matches = resolveByTag(map, tags);
+
+      if (opts.json) {
+        const output = matches.map((m) => ({
+          path: m.entry.path,
+          purpose: m.entry.purpose,
+          matchedPattern: m.matchedPattern,
+          priority: m.entry.priority ?? "normal",
+          owners: m.entry.owners,
+          tags: m.entry.tags,
+        }));
+        console.log(JSON.stringify(output, null, 2));
+        return;
+      }
+
+      if (matches.length === 0) {
+        console.log(chalk.yellow(`No entries tagged "${opts.tag}".`));
+        return;
+      }
+
+      console.log(
+        chalk.blue(`${matches.length} entry(s) tagged ${chalk.bold(opts.tag)}:\n`)
+      );
+
+      for (const match of matches) {
+        console.log(formatMatch(match));
+        console.log();
+      }
+      return;
+    }
+
+    // Path-based resolution
+    if (!targetPath) {
+      console.log(chalk.red("Provide a target path or use --tag."));
+      process.exit(1);
+    }
+
     const matches = resolveEntries(map, targetPath);
 
     if (opts.json) {
@@ -194,6 +235,7 @@ program
         purpose: m.entry.purpose,
         matchedPattern: m.matchedPattern,
         specificity: m.specificity,
+        priority: m.entry.priority ?? "normal",
         owners: m.entry.owners,
         tags: m.entry.tags,
       }));

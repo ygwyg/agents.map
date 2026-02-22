@@ -88,6 +88,29 @@ export function validate(map: AgentsMap, rootDir: string): ValidationResult {
       });
     }
 
+    // Validate priority if present
+    if (entry.priority) {
+      const validPriorities = ["critical", "high", "normal", "low"];
+      if (!validPriorities.includes(entry.priority)) {
+        diagnostics.push({
+          severity: "warning",
+          message: `Entry "${entry.path}": priority "${entry.priority}" is not a valid value. Expected: critical, high, normal, or low.`,
+          entryPath: entry.path,
+        });
+      }
+    }
+
+    // Validate last_modified format if present
+    if (entry.last_modified) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(entry.last_modified)) {
+        diagnostics.push({
+          severity: "warning",
+          message: `Entry "${entry.path}": last_modified "${entry.last_modified}" is not in YYYY-MM-DD format.`,
+          entryPath: entry.path,
+        });
+      }
+    }
+
     // Validate last_reviewed format if present
     if (entry.last_reviewed) {
       if (!/^\d{4}-\d{2}-\d{2}$/.test(entry.last_reviewed)) {

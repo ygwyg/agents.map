@@ -4,6 +4,7 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
+import * as posixPath from "node:path/posix";
 import type { AgentsMap, AgentsMapEntry } from "./types.js";
 
 const MAP_FILENAME = "AGENTS.map.md";
@@ -88,6 +89,20 @@ export function parseMarkdown(content: string): AgentsMap {
       continue;
     }
 
+    // Match "- Priority: ..."
+    const priorityMatch = trimmed.match(/^-\s+Priority:\s+(.+)$/i);
+    if (priorityMatch) {
+      currentEntry.priority = priorityMatch[1].trim().toLowerCase() as any;
+      continue;
+    }
+
+    // Match "- Last modified: ..."
+    const lastModifiedMatch = trimmed.match(/^-\s+Last\s+modified:\s+(.+)$/i);
+    if (lastModifiedMatch) {
+      currentEntry.last_modified = lastModifiedMatch[1].trim();
+      continue;
+    }
+
     // Match "- Last reviewed: ..."
     const reviewedMatch = trimmed.match(/^-\s+Last\s+reviewed:\s+(.+)$/i);
     if (reviewedMatch) {
@@ -107,13 +122,22 @@ export function parseMarkdown(content: string): AgentsMap {
   };
 }
 
+/** Derive a default scope from an entry path. */
+function defaultScopeFromPath(entryPath: string): string[] {
+  const dir = posixPath.dirname(entryPath);
+  if (dir === ".") return ["**"];
+  return [`${dir}/**`];
+}
+
 /** Finalize a partially-parsed entry with defaults for missing fields. */
 function finalizeEntry(partial: Partial<AgentsMapEntry>): AgentsMapEntry {
   const entry: AgentsMapEntry = {
     path: partial.path!,
-    scope: partial.scope ?? ["**"],
+    scope: partial.scope ?? defaultScopeFromPath(partial.path!),
     purpose: partial.purpose ?? "",
   };
+  if (partial.priority) entry.priority = partial.priority;
+  if (partial.last_modified) entry.last_modified = partial.last_modified;
   if (partial.owners) entry.owners = partial.owners;
   if (partial.tags) entry.tags = partial.tags;
   if (partial.last_reviewed) entry.last_reviewed = partial.last_reviewed;

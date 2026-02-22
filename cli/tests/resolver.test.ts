@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { resolveEntries, calculateSpecificity } from "../src/resolver.js";
+import { resolveEntries, resolveByTag, calculateSpecificity } from "../src/resolver.js";
 import type { AgentsMap } from "../src/types.js";
 
 describe("calculateSpecificity", () => {
@@ -120,6 +120,64 @@ describe("resolveEntries", () => {
     expect(matches[0].entry.path).toBe("services/auth/AGENTS.md");
   });
 
+  it("should sort by priority first, then specificity", () => {
+    const priorityMap: AgentsMap = {
+      schema_version: 1,
+      entries: [
+        {
+          path: "AGENTS.md",
+          scope: ["**"],
+          purpose: "Global.",
+          priority: "low",
+        },
+        {
+          path: "services/auth/AGENTS.md",
+          scope: ["services/auth/**"],
+          purpose: "Auth.",
+          priority: "normal",
+        },
+        {
+          path: "security/AGENTS.md",
+          scope: ["**"],
+          purpose: "Security policies.",
+          priority: "critical",
+        },
+      ],
+    };
+
+    const matches = resolveEntries(priorityMap, "services/auth/login.ts");
+    // Critical should come first despite lower specificity
+    expect(matches[0].entry.priority).toBe("critical");
+    // Then normal (auth) with higher specificity
+    expect(matches[1].entry.path).toBe("services/auth/AGENTS.md");
+    // Then low (global)
+    expect(matches[2].entry.priority).toBe("low");
+  });
+
+  it("should treat missing priority as normal", () => {
+    const mixedMap: AgentsMap = {
+      schema_version: 1,
+      entries: [
+        {
+          path: "AGENTS.md",
+          scope: ["**"],
+          purpose: "Global.",
+          priority: "high",
+        },
+        {
+          path: "src/AGENTS.md",
+          scope: ["src/**"],
+          purpose: "Source.",
+          // no priority = normal
+        },
+      ],
+    };
+
+    const matches = resolveEntries(mixedMap, "src/app.ts");
+    expect(matches[0].entry.path).toBe("AGENTS.md"); // high > normal
+    expect(matches[1].entry.path).toBe("src/AGENTS.md");
+  });
+
   it("should return empty array for no matches with restrictive scopes", () => {
     const restrictedMap: AgentsMap = {
       schema_version: 1,
@@ -134,5 +192,87 @@ describe("resolveEntries", () => {
 
     const matches = resolveEntries(restrictedMap, "docs/readme.md");
     expect(matches).toHaveLength(0);
+  });
+});
+
+describe("resolveByTag", () => {
+  const tagMap: AgentsMap = {
+    schema_version: 1,
+    entries: [
+      {
+        path: "AGENTS.md",
+        scope: ["**"],
+        purpose: "Global.",
+      },
+      {
+        path: "packages/ui/AGENTS.md",
+        scope: ["packages/ui/**"],
+        purpose: "Component library.",
+        tags: ["frontend", "shared"],
+        priority: "high",
+      },
+      {
+        path: "services/api/AGENTS.md",
+        scope: ["services/api/**"],
+        purpose: "API endpoints.",
+        tags: ["backend"],
+      },
+      {
+        path: "frontend/AGENTS.md",
+        scope: ["frontend/**"],
+        purpose: "Frontend app.",
+        tags: ["frontend"],
+      },
+      {
+        path: "security/AGENTS.md",
+        scope: ["**"],
+        purpose: "Security policies.",
+        tags: ["security", "compliance"],
+        priority: "critical",
+      },
+    ],
+  };
+
+  it("should find entries by tag", () => {
+    const matches = resolveByTag(tagMap, ["frontend"]);
+    expect(matches).toHaveLength(2);
+    const paths = matches.map((m) => m.entry.path);
+    expect(paths).toContain("packages/ui/AGENTS.md");
+    expect(paths).toContain("frontend/AGENTS.md");
+  });
+
+  it("should not match entries without tags", () => {
+    const matches = resolveByTag(tagMap, ["frontend"]);
+    const paths = matches.map((m) => m.entry.path);
+    expect(paths).not.toContain("AGENTS.md");
+  });
+
+  it("should sort results by priority", () => {
+    const matches = resolveByTag(tagMap, ["frontend", "security"]);
+    // Critical (security) should come first
+    expect(matches[0].entry.path).toBe("security/AGENTS.md");
+  });
+
+  it("should be case-insensitive", () => {
+    const matches = resolveByTag(tagMap, ["FRONTEND"]);
+    expect(matches).toHaveLength(2);
+  });
+
+  it("should match multiple tags", () => {
+    const matches = resolveByTag(tagMap, ["backend", "compliance"]);
+    expect(matches).toHaveLength(2);
+    const paths = matches.map((m) => m.entry.path);
+    expect(paths).toContain("services/api/AGENTS.md");
+    expect(paths).toContain("security/AGENTS.md");
+  });
+
+  it("should return empty for unknown tags", () => {
+    const matches = resolveByTag(tagMap, ["mobile"]);
+    expect(matches).toHaveLength(0);
+  });
+
+  it("should set matchedPattern to tag:<name>", () => {
+    const matches = resolveByTag(tagMap, ["backend"]);
+    expect(matches[0].matchedPattern).toBe("tag:backend");
   });
 });

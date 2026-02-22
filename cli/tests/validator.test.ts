@@ -204,6 +204,76 @@ describe("validate", () => {
     );
   });
 
+  it("should warn on invalid priority value", () => {
+    createFile("AGENTS.md");
+
+    const map: AgentsMap = {
+      schema_version: 1,
+      entries: [
+        {
+          path: "AGENTS.md",
+          scope: ["**"],
+          purpose: "Root.",
+          priority: "urgent" as any,
+        },
+      ],
+    };
+
+    const result = validate(map, tmpDir);
+    expect(result.diagnostics).toContainEqual(
+      expect.objectContaining({
+        severity: "warning",
+        message: expect.stringContaining("not a valid value"),
+      })
+    );
+  });
+
+  it("should pass with valid priority value", () => {
+    createFile("AGENTS.md");
+
+    const map: AgentsMap = {
+      schema_version: 1,
+      entries: [
+        {
+          path: "AGENTS.md",
+          scope: ["**"],
+          purpose: "Root.",
+          priority: "critical",
+        },
+      ],
+    };
+
+    const result = validate(map, tmpDir);
+    const priorityDiags = result.diagnostics.filter(
+      (d) => d.message.includes("priority")
+    );
+    expect(priorityDiags).toHaveLength(0);
+  });
+
+  it("should warn on invalid last_modified format", () => {
+    createFile("AGENTS.md");
+
+    const map: AgentsMap = {
+      schema_version: 1,
+      entries: [
+        {
+          path: "AGENTS.md",
+          scope: ["**"],
+          purpose: "Root.",
+          last_modified: "yesterday",
+        },
+      ],
+    };
+
+    const result = validate(map, tmpDir);
+    expect(result.diagnostics).toContainEqual(
+      expect.objectContaining({
+        severity: "warning",
+        message: expect.stringContaining("last_modified"),
+      })
+    );
+  });
+
   it("should pass with valid last_reviewed format", () => {
     createFile("AGENTS.md");
 

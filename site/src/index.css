@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --font-mono: 'Geist Mono', monospace;
+  --font-mono: 'Iosevka', monospace;
 }
 
 html {
@@ -11,7 +11,7 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: 'Geist Mono', monospace;
+  font-family: 'Iosevka', monospace;
   background: #000;
   color: #d4d4d8;
   -webkit-font-smoothing: antialiased;
@@ -25,17 +25,17 @@ body {
 /* ── Code editor ── */
 
 .editor {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
   border-radius: 8px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.20);
   transition: border-color 0.2s;
 }
 
 .editor:hover {
-  border-color: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.30);
 }
 
 .editor-titlebar {
@@ -61,13 +61,13 @@ body {
   border-radius: 4px;
   background: rgba(255, 255, 255, 0.05);
   color: rgba(255, 255, 255, 0.6);
-  font-family: 'Geist Mono', monospace;
+  font-family: 'Iosevka', monospace;
   font-size: 11px;
 }
 
 .editor-body {
   padding: 16px 0;
-  font-family: 'Geist Mono', monospace;
+  font-family: 'Iosevka', monospace;
   font-size: 13px;
   line-height: 1.7;
 }
@@ -114,18 +114,21 @@ body {
 .s-val { color: #e4e4e7; }
 .s-path { color: #93c5fd; }
 .s-glob { color: #c4b5fd; }
+.s-priority { color: #fbbf24; }
+.s-date { color: #a1a1aa; }
 .s-owner { color: #86efac; }
+.s-tag { color: #a5b4fc; }
 
 /* ── Terminal ── */
 
 .terminal {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
   border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.20);
   padding: 12px 16px;
-  font-family: 'Geist Mono', monospace;
+  font-family: 'Iosevka', monospace;
   font-size: 13px;
   display: flex;
   align-items: center;

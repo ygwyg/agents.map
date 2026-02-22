@@ -1,8 +1,26 @@
+import { useState, useCallback } from "react";
+
 function Terminal({ command }: { command: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(command).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    });
+  }, [command]);
+
   return (
-    <div className="terminal">
+    <div className="terminal group">
       <span className="terminal-prompt">$</span>
       <span className="terminal-cmd">{command}</span>
+      <button
+        onClick={handleCopy}
+        className="ml-auto flex-shrink-0 text-[11px] text-white/30 hover:text-white/60 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
+        title="Copy to clipboard"
+      >
+        {copied ? "copied" : "copy"}
+      </button>
     </div>
   );
 }
@@ -34,6 +52,12 @@ export function GetStarted() {
             Validate it
           </p>
           <Terminal command="npx agentsmap validate" />
+        </div>
+        <div>
+          <p className="text-[12px] text-white/50 mb-1.5">
+            Resolve by tag
+          </p>
+          <Terminal command="npx agentsmap resolve --tag frontend" />
         </div>
         <div>
           <p className="text-[12px] text-white/50 mb-1.5">

@@ -72,13 +72,67 @@ The AGENTS.md files themselves are authoritative for their subtrees.
     expect(entry.last_reviewed).toBe("2026-02-21");
   });
 
-  it("should default scope to ** when Applies to is missing", () => {
+  it("should parse priority field", () => {
+    const input = `- Path: /security/AGENTS.md
+  - Purpose: Security policies.
+  - Applies to: /security/**
+  - Priority: critical
+`;
+
+    const result = parseMarkdown(input);
+    expect(result.entries[0].priority).toBe("critical");
+  });
+
+  it("should parse last modified field", () => {
+    const input = `- Path: /AGENTS.md
+  - Purpose: Root conventions.
+  - Applies to: /**
+  - Priority: high
+  - Last modified: 2026-02-21
+`;
+
+    const result = parseMarkdown(input);
+    const entry = result.entries[0];
+    expect(entry.priority).toBe("high");
+    expect(entry.last_modified).toBe("2026-02-21");
+  });
+
+  it("should handle all fields together", () => {
+    const input = `- Path: /services/payments/AGENTS.md
+  - Purpose: PCI rules, Stripe patterns.
+  - Applies to: /services/payments/**
+  - Priority: critical
+  - Last modified: 2026-02-20
+  - Owners: @payments-team
+  - Tags: backend, compliance
+  - Last reviewed: 2026-02-21
+`;
+
+    const result = parseMarkdown(input);
+    const entry = result.entries[0];
+    expect(entry.priority).toBe("critical");
+    expect(entry.last_modified).toBe("2026-02-20");
+    expect(entry.owners).toEqual(["@payments-team"]);
+    expect(entry.tags).toEqual(["backend", "compliance"]);
+    expect(entry.last_reviewed).toBe("2026-02-21");
+  });
+
+  it("should default scope to ** for root AGENTS.md when Applies to is missing", () => {
     const input = `- Path: /AGENTS.md
   - Purpose: Minimal entry.
 `;
 
     const result = parseMarkdown(input);
     expect(result.entries[0].scope).toEqual(["**"]);
+  });
+
+  it("should default scope to entry directory when Applies to is missing for nested path", () => {
+    const input = `- Path: /services/payments/AGENTS.md
+  - Purpose: Payment rules.
+`;
+
+    const result = parseMarkdown(input);
+    expect(result.entries[0].scope).toEqual(["services/payments/**"]);
   });
 
   it("should return empty entries for empty content", () => {

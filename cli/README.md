@@ -49,29 +49,17 @@ Exits with code 1 on errors. Warnings (like unlisted `AGENTS.md` files) don't fa
 
 ### `agentsmap resolve <path>`
 
-Show which `AGENTS.md` files apply to a given path, ranked by specificity.
+Show which `AGENTS.md` files apply to a given path, ranked by priority then specificity.
 
 ```bash
 agentsmap resolve src/services/payments/checkout.ts
 ```
 
-Output:
+Use `--tag` to find entries by domain instead of path:
 
-```
-2 AGENTS.md file(s) apply to src/services/payments/checkout.ts:
-
-(most specific)
-  services/payments/AGENTS.md
-    Purpose: PCI rules, Stripe integration patterns.
-    Matched pattern: services/payments/**
-    Specificity: 6
-    Owners: @payments-team
-
-(#2)
-  AGENTS.md
-    Purpose: Global repo conventions.
-    Matched pattern: **
-    Specificity: 0
+```bash
+agentsmap resolve --tag frontend
+agentsmap resolve --tag backend,compliance
 ```
 
 Use `--json` for machine-readable output:
@@ -120,7 +108,9 @@ const result = validate(map, "/path/to/repo");
 - Path: /services/payments/AGENTS.md
   - Purpose: PCI rules, Stripe patterns.
   - Applies to: /services/payments/**
+  - Priority: critical
   - Owners: @payments-team
+  - Tags: backend, compliance
 ```
 
 When an agent enters your repo, it reads this file, matches entries by glob pattern, and loads the most specific instructions. If the map is missing or stale, agents fall back to scanning — nothing breaks.

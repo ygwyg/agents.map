@@ -17,7 +17,14 @@ export function defaultScope(agentsPath: string): string[] {
 
 /** Create a new AgentsMap structure from discovered files. */
 export function createMap(
-  entries: Array<{ path: string; purpose: string; owners?: string[]; tags?: string[] }>
+  entries: Array<{
+    path: string;
+    purpose: string;
+    priority?: "critical" | "high" | "normal" | "low";
+    last_modified?: string;
+    owners?: string[];
+    tags?: string[];
+  }>
 ): AgentsMap {
   return {
     schema_version: 1,
@@ -27,6 +34,8 @@ export function createMap(
         scope: defaultScope(e.path),
         purpose: e.purpose,
       };
+      if (e.priority && e.priority !== "normal") entry.priority = e.priority;
+      if (e.last_modified) entry.last_modified = e.last_modified;
       if (e.owners && e.owners.length > 0) entry.owners = e.owners;
       if (e.tags && e.tags.length > 0) entry.tags = e.tags;
       return entry;
@@ -49,6 +58,12 @@ export function toMarkdown(map: AgentsMap): string {
     lines.push(`- Path: /${entry.path}`);
     lines.push(`  - Purpose: ${entry.purpose}`);
     lines.push(`  - Applies to: ${entry.scope.map((s) => `/${s}`).join(", ")}`);
+    if (entry.priority && entry.priority !== "normal") {
+      lines.push(`  - Priority: ${entry.priority}`);
+    }
+    if (entry.last_modified) {
+      lines.push(`  - Last modified: ${entry.last_modified}`);
+    }
     if (entry.owners && entry.owners.length > 0) {
       lines.push(`  - Owners: ${entry.owners.join(", ")}`);
     }
