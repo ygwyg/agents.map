@@ -4,7 +4,7 @@
   "description": "CLI tool for the AGENTS.map specification — discover, validate, and resolve AGENTS.md instruction files.",
   "type": "module",
   "bin": {
-    "agentsmap": "./dist/index.js"
+    "agentsmap": "dist/index.js"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
