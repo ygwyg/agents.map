@@ -14,7 +14,7 @@ import * as readline from "node:readline";
 import { parseMap, findMap } from "./parser.js";
 import { validate } from "./validator.js";
 import { resolveEntries, resolveByTag, formatMatch } from "./resolver.js";
-import { discoverAgentFiles, inferPurpose } from "./discoverer.js";
+import { discoverAgentFiles, discoverDependencyAgentFiles, inferPurpose } from "./discoverer.js";
 import { createMap, toMarkdown } from "./generator.js";
 
 const program = new Command();
@@ -22,7 +22,7 @@ const program = new Command();
 program
   .name("agentsmap")
   .description("CLI tool for the AGENTS.map specification — discover, validate, and resolve AGENTS.md files.")
-  .version("0.2.0");
+  .version("0.2.1");
 
 // ──────────────────────────────────────────────────────────────────────────────
 // init
@@ -32,11 +32,20 @@ program
   .command("init")
   .description("Scan for AGENTS.md files and generate an AGENTS.map.md file.")
   .option("--non-interactive", "Skip interactive prompts; use inferred or placeholder purposes.")
-  .action(async (opts: { nonInteractive?: boolean }) => {
+  .option("--deps", "Include AGENTS.md files from installed dependencies (node_modules).")
+  .action(async (opts: { nonInteractive?: boolean; deps?: boolean }) => {
     const cwd = process.cwd();
 
     console.log(chalk.blue("Scanning for AGENTS.md files..."));
     const files = discoverAgentFiles(cwd);
+
+    if (opts.deps) {
+      const depFiles = discoverDependencyAgentFiles(cwd);
+      if (depFiles.length > 0) {
+        console.log(chalk.blue(`Found ${depFiles.length} dependency AGENTS.md file(s).`));
+        files.push(...depFiles);
+      }
+    }
 
     if (files.length === 0) {
       console.log(chalk.yellow("No AGENTS.md files found in this directory tree."));
@@ -271,11 +280,26 @@ program
 program
   .command("discover")
   .description("Scan for all AGENTS.md files and show their listing status.")
-  .action(() => {
+  .option("--deps", "Include AGENTS.md files from installed dependencies (node_modules).")
+  .action((opts: { deps?: boolean }) => {
     const cwd = process.cwd();
 
     console.log(chalk.blue("Scanning for AGENTS.md files...\n"));
     const files = discoverAgentFiles(cwd);
+
+    if (opts.deps) {
+      const depFiles = discoverDependencyAgentFiles(cwd);
+      if (depFiles.length > 0) {
+        console.log(chalk.blue(`Dependencies with AGENTS.md (${depFiles.length}):\n`));
+        for (const f of depFiles) {
+          const purpose = inferPurpose(path.join(cwd, f));
+          console.log(`  ${chalk.magenta("⬡")} ${f}`);
+          console.log(`    ${chalk.dim(purpose)}`);
+        }
+        console.log();
+        files.push(...depFiles);
+      }
+    }
 
     if (files.length === 0) {
       console.log(chalk.yellow("No AGENTS.md files found."));

@@ -63,6 +63,66 @@ function scanDir(currentDir: string, rootDir: string, results: string[]): void {
 }
 
 /**
+ * Scan node_modules for AGENTS.md files shipped by dependencies.
+ * Only checks the root of each package (not recursive).
+ */
+export function discoverDependencyAgentFiles(rootDir: string): string[] {
+  const results: string[] = [];
+  const nmDir = path.join(rootDir, "node_modules");
+
+  if (!fs.existsSync(nmDir)) return results;
+
+  let entries: fs.Dirent[];
+  try {
+    entries = fs.readdirSync(nmDir, { withFileTypes: true });
+  } catch {
+    return results;
+  }
+
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+
+    if (entry.name.startsWith("@")) {
+      // Scoped packages: @scope/package
+      const scopeDir = path.join(nmDir, entry.name);
+      let scopedEntries: fs.Dirent[];
+      try {
+        scopedEntries = fs.readdirSync(scopeDir, { withFileTypes: true });
+      } catch {
+        continue;
+      }
+      for (const pkg of scopedEntries) {
+        if (!pkg.isDirectory()) continue;
+        checkPackageForAgentsMd(
+          path.join(scopeDir, pkg.name),
+          `node_modules/${entry.name}/${pkg.name}`,
+          results
+        );
+      }
+    } else if (!entry.name.startsWith(".")) {
+      checkPackageForAgentsMd(
+        path.join(nmDir, entry.name),
+        `node_modules/${entry.name}`,
+        results
+      );
+    }
+  }
+
+  return results.sort();
+}
+
+function checkPackageForAgentsMd(
+  pkgDir: string,
+  relativePkgPath: string,
+  results: string[]
+): void {
+  const agentsPath = path.join(pkgDir, "AGENTS.md");
+  if (fs.existsSync(agentsPath)) {
+    results.push(`${relativePkgPath}/AGENTS.md`);
+  }
+}
+
+/**
  * Read the first meaningful line from an AGENTS.md file to infer a purpose.
  * Skips blank lines and heading markers.
  */

@@ -30,6 +30,12 @@ Interactive by default — prompts you for each file's purpose. Use `--non-inter
 agentsmap init --non-interactive
 ```
 
+Include `AGENTS.md` files from installed dependencies:
+
+```bash
+agentsmap init --deps
+```
+
 ### `agentsmap validate`
 
 Check that your `AGENTS.map.md` is valid: all listed paths exist, required fields are present, no duplicates, no path traversal.
@@ -76,6 +82,12 @@ Find all `AGENTS.md` files in your repo and show whether they're listed in the m
 agentsmap discover
 ```
 
+Include dependencies:
+
+```bash
+agentsmap discover --deps
+```
+
 Output shows listed files with `+` and unlisted with `?`, along with suggested purposes.
 
 ## Programmatic API
@@ -111,6 +123,15 @@ const result = validate(map, "/path/to/repo");
   - Priority: critical
   - Owners: @payments-team
   - Tags: backend, compliance
+```
+
+Entries can also reference dependencies:
+
+```markdown
+- Path: /node_modules/@acme/ui/AGENTS.md
+  - Purpose: Acme UI component conventions, theming, a11y.
+  - Applies to: /src/components/**
+  - Tags: frontend
 ```
 
 When an agent enters your repo, it reads this file, matches entries by glob pattern, and loads the most specific instructions. If the map is missing or stale, agents fall back to scanning — nothing breaks.

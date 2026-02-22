@@ -79,11 +79,15 @@ export function validate(map: AgentsMap, rootDir: string): ValidationResult {
     seenPaths.add(normalizedPath);
 
     // Check that the file actually exists
+    // Dependency paths (node_modules/) are ephemeral — warn instead of error
     const fullPath = path.join(rootDir, entry.path);
+    const isDep = entry.path.startsWith("node_modules/");
     if (!fs.existsSync(fullPath)) {
       diagnostics.push({
-        severity: "error",
-        message: `Entry "${entry.path}": file does not exist at ${fullPath}.`,
+        severity: isDep ? "warning" : "error",
+        message: isDep
+          ? `Entry "${entry.path}": dependency file not found. Run npm install to resolve.`
+          : `Entry "${entry.path}": file does not exist at ${fullPath}.`,
         entryPath: entry.path,
       });
     }

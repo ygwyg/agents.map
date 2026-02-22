@@ -274,6 +274,51 @@ describe("validate", () => {
     );
   });
 
+  it("should warn (not error) on missing node_modules path", () => {
+    const map: AgentsMap = {
+      schema_version: 1,
+      entries: [
+        {
+          path: "node_modules/@acme/ui/AGENTS.md",
+          scope: ["src/components/**"],
+          purpose: "Acme UI conventions.",
+        },
+      ],
+    };
+
+    const result = validate(map, tmpDir);
+    // Should still be valid — missing dependency is a warning, not error
+    expect(result.valid).toBe(true);
+    expect(result.diagnostics).toContainEqual(
+      expect.objectContaining({
+        severity: "warning",
+        message: expect.stringContaining("dependency file not found"),
+      })
+    );
+  });
+
+  it("should pass when node_modules dependency exists", () => {
+    createFile("node_modules/@acme/ui/AGENTS.md", "# Acme UI");
+
+    const map: AgentsMap = {
+      schema_version: 1,
+      entries: [
+        {
+          path: "node_modules/@acme/ui/AGENTS.md",
+          scope: ["src/components/**"],
+          purpose: "Acme UI conventions.",
+        },
+      ],
+    };
+
+    const result = validate(map, tmpDir);
+    expect(result.valid).toBe(true);
+    const missingDiags = result.diagnostics.filter(
+      (d) => d.message.includes("not found") || d.message.includes("does not exist")
+    );
+    expect(missingDiags).toHaveLength(0);
+  });
+
   it("should pass with valid last_reviewed format", () => {
     createFile("AGENTS.md");
 
