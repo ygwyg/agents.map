@@ -1,4 +1,4 @@
-# Spec — AGENTS.md
+# AGENTS.md
 
 The AGENTS.map specification.
 

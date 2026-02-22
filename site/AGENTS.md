@@ -1,4 +1,4 @@
-# Site — AGENTS.md
+# AGENTS.md
 
 The agents.map landing page. React + Tailwind CSS v4 + Vite.
 

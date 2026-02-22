@@ -1,4 +1,4 @@
-# CLI — AGENTS.md
+# AGENTS.md
 
 The `agentsmap` CLI tool. Published to npm as `agentsmap`.
 
