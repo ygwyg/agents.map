@@ -45,14 +45,14 @@ export function GetStarted() {
 
       <div className="flex flex-wrap items-center gap-4 text-[13px]">
         <a
-          href="https://github.com/anthropics/agents-map/blob/main/spec/v1.md"
+          href="https://github.com/ygwyg/agents.map/blob/main/spec/v1.md"
           className="text-white/50 hover:text-white/80 transition-colors"
         >
           Read the spec
         </a>
         <span className="text-white/25">·</span>
         <a
-          href="https://github.com/anthropics/agents-map"
+          href="https://github.com/ygwyg/agents.map"
           className="text-white/50 hover:text-white/80 transition-colors"
         >
           GitHub
@@ -66,7 +66,7 @@ export function GetStarted() {
         </a>
         <span className="text-white/25">·</span>
         <a
-          href="https://github.com/anthropics/agents-map/discussions"
+          href="https://github.com/ygwyg/agents.map/discussions"
           className="text-white/50 hover:text-white/80 transition-colors"
         >
           Discussions

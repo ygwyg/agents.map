@@ -22,7 +22,7 @@ export function Nav() {
           AGENTS<span className="text-white/40">.</span>map
         </a>
         <a
-          href="https://github.com/anthropics/agents-map"
+          href="https://github.com/ygwyg/agents.map"
           target="_blank"
           rel="noopener noreferrer"
           className="text-[13px] text-white/50 hover:text-white/80 transition-colors"

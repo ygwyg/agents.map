@@ -1,6 +1,4 @@
 @import "tailwindcss";
-@import "@cloudflare/kumo/styles";
-@source "../node_modules/@cloudflare/kumo/dist";
 
 @theme {
   --font-mono: 'Geist Mono', monospace;

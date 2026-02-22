@@ -13,15 +13,12 @@ function App() {
       <div className="fixed inset-0 z-0 pointer-events-none opacity-20">
         <PixelBlast
           variant="square"
-          pixelSize={3}
+          pixelSize={4}
           color="#ffffff"
           patternScale={1.5}
           patternDensity={0.5}
           enableRipples={false}
-          rippleSpeed={0.3}
-          rippleThickness={0.1}
-          rippleIntensityScale={1}
-          speed={0.5}
+          speed={0.3}
           transparent
           edgeFade={0}
         />
