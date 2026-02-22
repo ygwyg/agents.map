@@ -1,0 +1,26 @@
+node_modules/
+dist/
+.cache/
+.turbo/
+*.tsbuildinfo
+
+# Site build output
+site/dist/
+
+# CLI build output
+cli/dist/
+
+# Environment
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Claude
+.claude/
